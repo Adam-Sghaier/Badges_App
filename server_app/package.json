@@ -23,6 +23,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "inet_ipv4": "^1.0.1",
     "ip": "^1.1.8",
     "joi": "^17.9.2",
     "joi-password-complexity": "^5.1.0",

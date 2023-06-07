@@ -31,7 +31,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// test routes
+// test routes  
 
 // app.use("/", router);
 
@@ -49,7 +49,7 @@ app.use('/api/agents', agentRouter);
 app.use('/api/ip', ipRouter);
 
 db.sequelize.sync({ force: true }).then(() => {
-    console.log("re-sync db Successful");
+    
 });
 
 

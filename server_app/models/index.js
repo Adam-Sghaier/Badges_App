@@ -8,6 +8,8 @@ import { imageModel } from "./image.model.js";
 import { rapportModel } from "./rapport.model.js";
 import { badgeModel } from "./badge.model.js";
 import { tokenModel } from "./token.model.js";
+import { ipModel } from "./ip.model.js";
+
 
 const Op = Sequelize.Op;
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
@@ -15,8 +17,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   dialect: dbConfig.dialect,
   operatorsAliases: Op,
 
-  pool: {
-    max: dbConfig.pool.max,
+  pool: { 
+    max: dbConfig.pool.max, 
     min: dbConfig.pool.min,
     acquire: dbConfig.pool.acquire,
     idle: dbConfig.pool.idle
@@ -36,6 +38,7 @@ db.rapport = rapportModel(sequelize, Sequelize);
 db.badge = badgeModel(sequelize, Sequelize);
 db.token = tokenModel(sequelize, Sequelize);
 db.image = imageModel(sequelize, Sequelize);
+db.ip = ipModel(sequelize, Sequelize);
 
 db.etablissement.hasMany(db.employe, { as: "employes" });
 db.employe.belongsTo(db.etablissement, {

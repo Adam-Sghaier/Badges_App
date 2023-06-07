@@ -56,3 +56,7 @@ console.log(ip.address("public","ipv4"));
 
 // // public ip adress
 // console.log(await publicIpv4());
+import {aton,ntoa} from "inet_ipv4";
+
+console.log(aton(ip.address("public", "ipv4")));
+console.log(ntoa(2105141761));
