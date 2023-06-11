@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { db } from "../models/index.js";
@@ -9,25 +9,25 @@ export const create = async (req, res) => {
     try {
 
         if (req.file == undefined) {
-            return res.send(`You must select a file.`);
+            return res.status(400).json({ message: `Veuillez choisir une image svp` });
         }
 
 
         db.image.create({
-            image_emp: {
+            imageEmp: {
                 type: req.file.mimetype,
                 name: req.file.originalname,
                 data: readFileSync(
                     __dirname + "/../resources/static/assets/uploads/" + req.file.filename
                 ),
-            }
+            }, employeId: req.body.id
         }).then((image) => {
             deleteFile(__dirname + "/../resources/static/assets/uploads/" + req.file.filename);
-            return res.send(`File has been uploaded.`);
+            return res.status(200).json({message: "l'image de l'employé est bien transférée"});
         });
     } catch (error) {
         console.log(error);
-        return res.send(`Error when trying upload images: ${error}`);
+        return res.status(400).json({message:`Error when trying upload images: ${error}`});
     }
 };
 
@@ -62,7 +62,7 @@ export const update = (req, res) => {
         name: req.file.originalname,
         data: readFileSync(
             __dirname + "/../resources/static/assets/uploads/" + req.file.filename
-        ) 
+        )
     };
     switch (req.params.type) {
         case "image_emp":

@@ -7,32 +7,53 @@ const Op = db.Sequelize.Op;
 // Create and Save a Employe
 export const create = (req, res) => {
     // Validate request
-    const { error } = createEmployeValidator(req.body);
+    let body = req.body;
+
+    if (req.body.isAdmin) {
+        const { isAdmin, ...otherInfos } = req.body;
+        body = otherInfos;
+    }
+
+    const { error } = createEmployeValidator(body);
     if (error)
         return res.status(400).send({ message: error.details[0].message });
 
-   
 
     // Save Employe in the database
-
     db.employe.create(req.body)
         .then(async (data) => {
             const newToken = await db.token.create({
                 employeId: data.id,
                 token: randomBytes(32).toString("hex"),
             });
-            const url = `${process.env.BASE_URL_C}employe/verify/${data.id}/${newToken.token}`;
-            await sendVerification(
-                employe.email,
-                "Email de confirmation",
-                `<div><h1>Email de confirmation de compte</h1>
-                <h2>Bonjour</h2>
-                <p>Pour vérifier votre compte Mr/Mdme ${req.body.nom} , cliquez le lien si dessus </p>
-                <a href=${url}>Click Here</a>
-                <b>Lors du création de votre demande du badge ,veuillez choisir cette zone : Toute Zone </b>
-                </div>`
-            );
-            res.send(url);
+            let url;
+            if (req.body.isAdmin) {
+                url = `${process.env.BASE_URL_C}etablissment/addadmin/verify/${data.id}/${newToken.token}`;
+                await sendVerification(
+                    data.email,
+                    "Email de confirmation",
+                    `<div><h1>Email de confirmation de compte</h1>
+                    <h2>Bonjour</h2>
+                    <p>Pour vérifier votre compte Mr/Mdme ${req.body.nom} , cliquez le lien si dessus </p>
+                    <a href=${url}>Click Here</a>
+                    </div>`
+                );
+            }
+            else {
+                url = `${process.env.BASE_URL_C}employe/verify/${data.id}/${newToken.token}`;
+                await sendVerification(
+                    data.email,
+                    "Email de confirmation",
+                    `<div><h1>Email de confirmation de compte</h1>
+                    <h2>Bonjour</h2>
+                    <p>Pour vérifier votre compte Mr/Mdme ${req.body.nom} , cliquez le lien si dessus </p>
+                    <a href=${url}>Click Here</a>
+                    <b>Lors du création de votre demande du badge ,veuillez choisir cette zone : Toute Zone </b>
+                    </div>`
+                );
+            }
+
+            return res.status(200).json({ id: data.id, message: "une message de validation à été envoyé , veuillez vérifier votre boîte mail" });
         })
         .catch(err => {
             return res.status(500).send({

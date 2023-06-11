@@ -2,12 +2,23 @@ import Joi from "joi";
 import JoiPasswordComplexity from "joi-password-complexity";
 //create validator schema 
 
+export const createEtablissementValidator = (data) => {
+    const schema = Joi.object({
+        denominationSociale: Joi.string().min(3).label("Dénomination Sociale").required(),
+        email: Joi.string().email().label("email").required(),
+    });
+    return schema.validate(data);
+
+}
+
+
 export const createEmployeValidator = (data) => {
     const schema = Joi.object({
         nom: Joi.string().min(3).max(30).label("nom").required(),
         prenom: Joi.string().min(3).max(30).label("prenom").required(),
         email: Joi.string().email().label("email").required(),
-        fonction: Joi.string().min(3).max(30).label("fonction").required()
+        fonction: Joi.string().min(3).max(30).label("fonction").required(),
+        password: JoiPasswordComplexity().label("password"),
     });
     return schema.validate(data);
 

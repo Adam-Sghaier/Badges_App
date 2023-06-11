@@ -1,6 +1,6 @@
 import multer from "multer";
 import fs from"fs"
-import path from 'path';
+import path from 'path'; 
 import { fileURLToPath } from 'url'; 
 const imageFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) {

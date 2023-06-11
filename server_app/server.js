@@ -17,18 +17,16 @@ const app = express();
 // dotenv
 config();
 
-const corsOptions = {
-    origin: "http://localhost:8081"
-};
+// const corsOptions = {
+//     origin: "http://localhost:3000"
+// };
 
 // middlewares  
-app.use(cors(corsOptions));
+app.use(cors());
 
 // parse requests of content-type - application/json
 app.use(express.json());
 
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
 
 
 // test routes  
@@ -39,7 +37,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // router.post("/upload", fileCheck.single("file"), uploadFile);
 
-
+app.get("/", (req, res) => {
+    res.send("hello , server is running");
+})
 // app routes
 app.use('/api/employes', employeRouter);
 app.use('/api/etablissements', etablissementRouter);
@@ -48,10 +48,10 @@ app.use('/api/demandes', demandeRouter);
 app.use('/api/agents', agentRouter);
 app.use('/api/ip', ipRouter);
 
-db.sequelize.sync({ force: true }).then(() => {
-    
-});
+db.sequelize.sync({force : true}).then(() => {
 
+});
+  
 
 
 // set port, listen for requests

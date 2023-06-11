@@ -1,9 +1,10 @@
 import React, { useContext, useState } from "react";
-import styles from "./ajout.module.css";
+import styles from "./addadmin.module.css";
 import axios from "axios";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
-
-const Ajout = () => {
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+const AddAdmin = ({ inputs }) => {
   const [file, setFile] = useState("");
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState({});
@@ -11,10 +12,18 @@ const Ajout = () => {
   const [addState, setAddState] = useState("");
   const [isSuccessAlertVisible, setIsSuccessAlertVisible] = useState(false);
   const [isErrorAlertVisible, setIsErrorAlertVisible] = useState(false);
+  const [passwordType, setPasswordType] = useState("password");
 
   const handleChange = (e) => {
     setInfo((prev) => ({ ...prev, [e.target.id]: e.target.value }));
-    console.log(info);
+  };
+
+  const togglePassword = () => {
+    if (passwordType === "password") {
+      setPasswordType("text");
+      return;
+    }
+    setPasswordType("password");
   };
 
   const handleSubmit = async (e) => {
@@ -24,24 +33,21 @@ const Ajout = () => {
     setLoading(true);
     // prepare form Data
     let formData = new FormData();
-    formData.append("logo", file);
-    for (var i of Object.entries(info)) {
-      formData.append(i[0], i[1]);
-    }
-    for (var key of formData.entries()) {
-      console.log(key[0] + " , " + key[1]);
-    }
-
+    formData.append("img", file);
+    setInfo((prev) => ({ ...prev, isAdmin: true , fonction : "Admin" }));
     await axios
-      .post("/etablissements", formData)
-      .then((res) => {
-        setLoading(false);
-        setMessage(res.data.message);
-        setAddState("Ajout avec Succées");
-        setIsSuccessAlertVisible(true);
-        setTimeout(() => {
-          setIsSuccessAlertVisible(false);
-        }, 4000);
+      .post("/employes", info)
+      .then(async (res) => {
+        formData.append("id", res.data.id);
+        await axios.post("/images", formData).then(() => {
+          setLoading(false);
+          setMessage(res.data.message);
+          setAddState("Ajout avec Succées");
+          setIsSuccessAlertVisible(true);
+          setTimeout(() => {
+            setIsSuccessAlertVisible(false);
+          }, 4000);
+        });
       })
       .catch((error) => {
         setLoading(false);
@@ -60,15 +66,7 @@ const Ajout = () => {
           className={styles.form_container}
           onSubmit={(e) => handleSubmit(e)}
         >
-          <h1>Ajout Etablissement</h1>
-          <input
-            type="text"
-            placeholder="Dénomination Sociale"
-            id="denominationSociale"
-            onChange={handleChange}
-            required
-            className={styles.input}
-          />
+          <h1>Ajout Admin Etablissement</h1>
           <div className={styles.imageWrapper}>
             <img
               src={
@@ -77,7 +75,7 @@ const Ajout = () => {
                   : "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg"
               }
               alt=""
-              className={styles.etabImg}
+              className={styles.adminImg}
               required
             />
 
@@ -95,14 +93,30 @@ const Ajout = () => {
               />
             </div>
           </div>
-          <input
-            type="email"
-            placeholder="Email"
-            id="email"
-            onChange={handleChange}
-            required
-            className={styles.input}
-          />
+          {inputs.map((input) => (
+            <div className={styles.formInput} key={input.id}>
+              <input
+                onChange={handleChange}
+                type={input.id === "password" ? passwordType : input.type}
+                placeholder={input.placeholder}
+                id={input.id}
+                className={styles.input}
+              />
+              {input.id === "password" && (
+                <button
+                  type="button"
+                  className={styles.pButton}
+                  onClick={(e) => togglePassword(e)}
+                >
+                  {passwordType === "password" ? (
+                    <FontAwesomeIcon icon={faEyeSlash} />
+                  ) : (
+                    <FontAwesomeIcon icon={faEye} />
+                  )}
+                </button>
+              )}
+            </div>
+          ))}
           {addState === "Validation Error" && isErrorAlertVisible && (
             <div className={styles.error_msg}>{message}</div>
           )}
@@ -120,4 +134,4 @@ const Ajout = () => {
   );
 };
 
-export default Ajout;
+export default AddAdmin;

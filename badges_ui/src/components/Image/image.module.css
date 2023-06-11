@@ -1,0 +1,20 @@
+body {
+  background-image: url("../../images/IMG_20190526_191619.jpg");
+  object-fit: cover;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.bg_black {
+  display: flex;
+  font-family: "Anonymous Pro", monospace;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #fff;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+}

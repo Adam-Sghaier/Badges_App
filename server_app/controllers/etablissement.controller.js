@@ -1,39 +1,86 @@
+import { randomBytes } from "crypto";
 import { db } from "../models/index.js";
+import { createEtablissementValidator } from "../utils/validator.js";
+import { sendVerification } from "../utils/email.js";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import path from "path";
+import { deleteFile } from "../utils/multerFileHandler.js";
 const Op = db.Sequelize.Op;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // Create and Save a new Tutorial
 export const create = (req, res) => {
-    // Validate request
-    if (!req.body.denomination_sociale) {
-        res.status(400).send({
-            message: "Name required !"
-        });
-        return;
-    }
-    if (!req.body.logo) {
-        res.status(400).send({
-            message: "Logo required !"
-        });
-        return;
-    }
 
-    // Create an establishment
+    if (req.file == undefined) {
+        return res.status(400).json({ message: `You must select a file.` });
+    }
+    // form validation
+    const { error } = createEtablissementValidator(req.body);
+    if (error)
+        return res.status(400).send({ message: error.details[0].message });
+
     const etablissement = {
-        denomination_sociale: req.body.denomination_sociale,
-        logo: req.body.logo,
+        ...req.body,
+        logo: {
+            type: req.file.mimetype,
+            name: req.file.originalname,
+            data: readFileSync(
+                __dirname + "/../resources/static/assets/uploads/" + req.file.filename
+            ),
+        }
     }
-
     // Save establishment in the database
     db.etablissement.create(etablissement)
-        .then(data => {
-            res.send(data);
-        })
+        .then(
+            async (data) => {
+                const newToken = await db.token.create({
+                    etablissementId: data.id,
+                    token: randomBytes(32).toString("hex"),
+                });
+                const url = `${process.env.BASE_URL_C}etablissement/verify/${data.id}/${newToken.token}`;
+                await sendVerification(
+                    data.email,
+                    "Email de Validation",
+                    `<div><h1>Email de Validation d'établissement</h1>
+                <h2>Bonjour</h2>
+                <p>Pour Valider votre établissement ${data.denominationSociale} , cliquez le lien si dessus </p>
+                <a href=${url}>Click Here</a>
+                </div>`
+                );
+                deleteFile(__dirname + "/../resources/static/assets/uploads/" + req.file.filename);
+                return res.status(200).send({ data, message: "un message de validation d'établissment à été envoyé,Veullez consulter votre boite mail" });
+            })
         .catch(err => {
-            res.status(500).send({
+            return res.status(500).send({
                 message:
                     err.message || "Some error occurred while creating the Establishment."
             });
         });
 }
+
+export const verifyLink = async (req, res) => {
+    try {
+        const etablissement = await db.etablissement.findByPk(req.params.id);
+        if (!etablissement)
+            return res.status(400).json({ message: "etablissement non trouvé, veuillez reprendre de nouveau l'ajout de votre etablissement" });
+
+        const token = await db.token.findOne({ where: { token: req.params.token, etablissementId: etablissement.id } });
+        if (!token)
+            return res.status(400).json({ message: "token invalide, veuillez reprendre de nouveau l'ajout de votre etablissement" });
+
+        await db.etablissement.update({ verified: true }, { where: { id: etablissement.id } });
+        await db.token.destroy({ where: { token: req.params.token } }).then(() => {
+            res.status(200).json({ message: "Etablissement verifié , veuillez ajouter un admin svp " });
+        });
+    } catch (error) {
+        return res.status(500).send({
+            message:
+                error.message || "Un erreur apparu lors du validation d'établissement "
+        });
+    }
+}
+
 
 // Retrieve all Establishments from the database.
 export const findAll = (req, res) => {
@@ -73,16 +120,32 @@ export const findOne = (req, res) => {
 }
 
 // Update a Tutorial by the id in the request
-export const update = (req, res) => {
+export const updateImg = (req, res) => {
     const id = req.params.id;
 
-    db.etablissement.update(req.body, {
+    if (req.file === undefined) {
+        return res.status(400).json({ message: `You must select an image.` });
+    }
+    let image;
+    if (req.file) {
+        image = {
+            logo: {
+                type: req.file.mimetype,
+                name: req.file.originalname,
+                data: readFileSync(
+                    __dirname + "/../resources/static/assets/uploads/" + req.file.filename
+                )
+            }
+        }
+    }
+
+    db.etablissement.update(image, {
         where: { id: id }
     })
         .then(num => {
             if (num == 1) {
                 res.send({
-                    message: "Etablissement was updated successfully."
+                    message: "Etablissement image was updated successfully."
                 });
             } else {
                 res.send({

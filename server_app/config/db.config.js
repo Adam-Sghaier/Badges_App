@@ -2,7 +2,7 @@
 export const dbConfig = {
   HOST: "localhost",
   USER: "adem",
-  PASSWORD: "adem@2001&ADEM",
+  PASSWORD: "adem",
   DB: "DB_Badges",
   dialect: "mysql",
   pool: {

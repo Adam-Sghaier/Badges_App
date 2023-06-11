@@ -8,13 +8,24 @@ export const etablissementModel = (sequelize, Sequelize) => {
         denominationSociale: {
             type: Sequelize.STRING,
             allowNull: false,
-            unique:{
-                msg:"le nom d'établissment déjà existe"
-            } 
+            unique: {
+                msg: "Nom d'établissement déjà existant"
+            }
         },
         logo: {
+            type: Sequelize.JSON,
+            allowNull:false
+        },
+        email: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: {
+                msg: "Email d'établissement déja existant"
+            }
+        },
+        verified: {
+            type: Sequelize.BOOLEAN,
+            defaultValue: false
         }
     });
 

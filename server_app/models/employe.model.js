@@ -22,7 +22,6 @@ export const employeModel = (sequelize, Sequelize) => {
         },
         password: {
             type: Sequelize.STRING,
-
         },
         fonction: {
             type: Sequelize.STRING,

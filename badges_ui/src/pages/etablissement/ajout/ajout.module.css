@@ -1,0 +1,107 @@
+/* Google Fonts */
+@import url(https://fonts.googleapis.com/css?family=Anonymous+Pro);
+
+/* GLOBAL STYLES */
+body {
+  background-image: url("../../../images/IMG_20190526_191619.jpg");
+  object-fit: cover;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.bg_black {
+  display: flex;
+  font-family: "Anonymous Pro", monospace;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #fff;
+  width: 100vw;
+  min-height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.ajoutContainer {
+  width: 70vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.form_container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.input {
+  outline: none;
+  border: none;
+  width: 300px;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #e3ebe9;
+  margin: 5px 0;
+  font-size: 14px;
+}
+.imageWrapper {
+  display: flex;
+  gap: 2em;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+}
+label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.icon {
+  cursor: pointer;
+}
+.etabImg {
+  width: 140px;
+  height: 140px;
+  border-radius: 70px;
+}
+.white_btn,
+.blue_btn {
+  border: none;
+  outline: none;
+  padding: 12px 0;
+  background-color: white;
+  border-radius: 20px;
+  width: 180px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.blue_btn {
+  background-color: #003580;
+  color: white;
+  margin: 10px;
+}
+.error_msg,
+.success_msg {
+  width: 370px;
+  padding: 15px;
+  margin: 5px 0;
+  font-size: 14px;
+  background-color: #f34646;
+  color: white;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.success_msg {
+  background-color: #0071c2;
+}
+
+.blue_btn:disabled {
+  background-color: #0071c28c;
+  cursor: not-allowed;
+}

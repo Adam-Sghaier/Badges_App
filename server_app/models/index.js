@@ -74,5 +74,10 @@ db.badge.belongsTo(db.employe, {
 
 db.badge.belongsTo(db.demande, { foreignKey: "demandeId" });
 db.token.belongsTo(db.employe, { foreignKey: "employeId" });
+db.token.belongsTo(db.etablissement, { foreignKey: "etablissementId" });
+
 db.token.belongsTo(db.agent, { foreignKey: "agentId" });
 db.image.belongsTo(db.employe,{ foreignKey: "employeId"});
+db.ip.belongsTo(db.employe, { foreignKey: "employeId" });
+db.ip.belongsTo(db.agent, { foreignKey: "agentId" });
+
