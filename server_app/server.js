@@ -48,7 +48,7 @@ app.use('/api/demandes', demandeRouter);
 app.use('/api/agents', agentRouter);
 app.use('/api/ip', ipRouter);
 
-db.sequelize.sync({force : true}).then(() => {
+db.sequelize.sync().then(() => {
 
 });
   

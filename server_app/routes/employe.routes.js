@@ -6,7 +6,8 @@ export const employeRouter = express.Router();
 employeRouter.post("/", create);
 
 //check verification link
-employeRouter.get("/verify/:id/:tokenId",verifyLink);
+employeRouter.get("/verify/:id/:token",verifyLink);
+
 // Retrieve all e Employe 
 employeRouter.get("/", findAll);
 

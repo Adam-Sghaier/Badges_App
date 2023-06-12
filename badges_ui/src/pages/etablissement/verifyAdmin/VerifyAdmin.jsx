@@ -1,26 +1,19 @@
-import { useState } from "react";
-import styles from "./verify.module.css";
-import check_mark from "../../../images/check-mark.png";
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import styles from "./verifyadmin.module.css";
 import axios from "axios";
-const Verify = () => {
+import check_mark from "../../../images/check-mark.png";
+import { Link, useParams } from "react-router-dom";
+const VerifyAdmin = () => {
   // manage the url state
   const [validUrl, setValidUrl] = useState(false);
   const [message, setMessage] = useState(false);
-  const [etabId, setEtabId] = useState("");
   const params = useParams();
-  const navigate = useNavigate();
-  const toAddAdmin = () => {
-    navigate("/etablissement/addAdmin", { state: { etabId } });
-  };
   useEffect(() => {
     const verifyEmailUrl = async () => {
       try {
         const res = await axios.get(
-          `/etablissements/verify/${params.etabId}/${params.tokenEtab}`
+          `/employes/verify/${params.adminId}/${params.tokenAdmin}`
         );
-        setEtabId(params.etabId);
         setMessage(res.data.message);
         setValidUrl(true);
       } catch (error) {
@@ -37,9 +30,9 @@ const Verify = () => {
           <img src={check_mark} alt="success_img" />
           <h1>{message}</h1>
 
-          <button className={styles.blue_btn} onClick={toAddAdmin}>
-            Ajout Admin
-          </button>
+          <Link to="/etablissement/login">
+            <button className={styles.blue_btn}>Connexion</button>
+          </Link>
         </div>
       ) : (
         <h1>404 not found </h1>
@@ -48,4 +41,4 @@ const Verify = () => {
   );
 };
 
-export default Verify;
+export default VerifyAdmin;

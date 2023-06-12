@@ -51,12 +51,12 @@ import ip from "ip";
 
 // local ip adreess
 console.log(ip.address("public","ipv4"));
-
+console.log(ip.address("private","ipv4"));
 // import { publicIp, publicIpv4, publicIpv6 } from 'public-ip';
 
 // // public ip adress
 // console.log(await publicIpv4());
 import {aton,ntoa} from "inet_ipv4";
 
-console.log(aton(ip.address("public", "ipv4")));
-console.log(ntoa(2105141761));
+// console.log(aton(ip.address("private", "ipv4")));
+// console.log(ntoa(3232235794));

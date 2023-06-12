@@ -11,7 +11,7 @@ imageRouter.post("/", fileCheck.single('img'), create);
 imageRouter.get("/:id", findOne);
 
 // Update employe with id
-imageRouter.put("/:id/:type", fileCheck.single('file') , update);
+imageRouter.put("/:id/:type", fileCheck.single('img') , update);
 
 // Delete employe with id
 imageRouter.delete("/:id", _delete);

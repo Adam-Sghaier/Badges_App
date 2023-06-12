@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Create and Save a new Tutorial
 export const create = (req, res) => {
-
+    console.log(req.ip);
     if (req.file == undefined) {
         return res.status(400).json({ message: `You must select a file.` });
     }
@@ -71,7 +71,7 @@ export const verifyLink = async (req, res) => {
 
         await db.etablissement.update({ verified: true }, { where: { id: etablissement.id } });
         await db.token.destroy({ where: { token: req.params.token } }).then(() => {
-            res.status(200).json({ message: "Etablissement verifié , veuillez ajouter un admin svp " });
+            return res.status(200).json({ message: "Etablissement verifié , veuillez ajouter un admin svp " });
         });
     } catch (error) {
         return res.status(500).send({

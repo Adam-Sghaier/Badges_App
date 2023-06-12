@@ -3,6 +3,9 @@ import { randomBytes } from "crypto";
 import { sendVerification } from "../utils/email.js";
 import { createEmployeValidator, updateEmployeValidator } from "../utils/validator.js";
 import bcrypt from "bcryptjs";
+import { aton } from "inet_ipv4";
+import ip from "ip";
+
 const Op = db.Sequelize.Op;
 // Create and Save a Employe
 export const create = (req, res) => {
@@ -10,17 +13,19 @@ export const create = (req, res) => {
     let body = req.body;
 
     if (req.body.isAdmin) {
-        const { isAdmin, ...otherInfos } = req.body;
-        body = otherInfos;
+        const { isAdmin, password, etablissementId, ...otherInfos } = req.body;
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
+        body = { password, ...otherInfos };
     }
 
     const { error } = createEmployeValidator(body);
     if (error)
         return res.status(400).send({ message: error.details[0].message });
 
-
+    body = { ...body, etablissementId: req.body.etablissementId };
     // Save Employe in the database
-    db.employe.create(req.body)
+    db.employe.create(body)
         .then(async (data) => {
             const newToken = await db.token.create({
                 employeId: data.id,
@@ -28,16 +33,26 @@ export const create = (req, res) => {
             });
             let url;
             if (req.body.isAdmin) {
-                url = `${process.env.BASE_URL_C}etablissment/addadmin/verify/${data.id}/${newToken.token}`;
-                await sendVerification(
-                    data.email,
-                    "Email de confirmation",
-                    `<div><h1>Email de confirmation de compte</h1>
-                    <h2>Bonjour</h2>
-                    <p>Pour vérifier votre compte Mr/Mdme ${req.body.nom} , cliquez le lien si dessus </p>
-                    <a href=${url}>Click Here</a>
-                    </div>`
-                );
+                db.ip.create({ ip_address: aton(ip.address("public", "ipv4")), employeId: data.id })
+                    .then(async () => {
+                        url = `${process.env.BASE_URL_C}etablissement/addAdmin/verify/${data.id}/${newToken.token}`;
+                        await sendVerification(
+                            data.email,
+                            "Email de confirmation",
+                            `<div><h1>Email de confirmation de compte</h1>
+                            <h2>Bonjour</h2>
+                            <p>Pour vérifier votre compte Mr/Mdme ${req.body.nom} , cliquez le lien si dessus </p>
+                            <a href=${url}>Click Here</a>
+                            </div>`
+                        );
+                    })
+                    .catch(err => {
+                        return res.status(500).send({
+                            message:
+                                err.message || "Some error occurred while creating the ip_address."
+                        });
+                    });
+
             }
             else {
                 url = `${process.env.BASE_URL_C}employe/verify/${data.id}/${newToken.token}`;
@@ -69,13 +84,13 @@ export const verifyLink = async (req, res) => {
         if (!employe)
             return res.status(400).json({ message: "employe invalide, veuillez contacter votre administrtation SVP" });
 
-        const token = await db.token.findOne({ where: { token: req.params.tokenId, employeId: employe.id } });
+        const token = await db.token.findOne({ where: { token: req.params.token, employeId: employe.id } });
         if (!token)
             return res.status(400).json({ message: "token invalide, veuillez contacter votre administrtation SVP" });
 
         await db.employe.update({ verified: true }, { where: { id: employe.id } });
-        await db.token.destroy({ where: { token: req.params.tokenId } }).then(() => {
-            res.send("lien verifié");
+        await db.token.destroy({ where: { token: req.params.token } }).then(() => {
+            return res.status(200).json({ message: "lien verifié" });
         });
     } catch (error) {
         return res.status(500).send({
@@ -123,6 +138,26 @@ export const findOne = (req, res) => {
         });
 }
 
+// Find a single Establishment with an id
+export const findAdmin = (req, res) => {
+    const id = req.params.id;
+
+    db.employe.findOne({ where: { isAdmin: true, etablissementId: req.body.etabId } })
+        .then(data => {
+            if (data) {
+                res.status(200).json({ message: true });
+            } else {
+                res.status(404).send({
+                    message: false
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: "Error retrieving Employe with id=" + id
+            });
+        });
+}
 // Update a Employe by the id in the request
 export const update = (req, res) => {
     const id = req.params.id;

@@ -7,6 +7,9 @@ import Image from './components/Image/Image';
 import Verify from './pages/etablissement/verify/verify';
 import AddAdmin from './pages/etablissement/addAdmin/AddAdmin';
 import { employeInputs } from './formSource';
+import VerifyAdmin from './pages/etablissement/verifyAdmin/VerifyAdmin';
+import NotFound from './pages/notFound/NotFound';
+import Login from './pages/etablissement/login/Login';
 
 function App() {
   // const { darkMode } = useContext(DarkModeContext);
@@ -56,6 +59,11 @@ function App() {
           <Route
             path="etablissement"
           >
+            <Route path="login">
+              <Route index element={<Login />} />
+              {/* <Route path="forgot_password" element={<ForgotPass />} />
+              <Route path="password_reset/:id/:token" element={<PasswordReset />} /> */}
+            </Route>
             <Route
               path="ajout"
               element={
@@ -63,19 +71,30 @@ function App() {
               }
             />
             <Route
-              path="verify/:etabId/:token"
+              path="verify/:etabId/:tokenEtab"
               element={
                 <Verify />
               }
             />
             <Route
               path="addAdmin"
-              element={
-                <AddAdmin inputs={employeInputs}/>
-              }
-            />
+            >
+              <Route
+                index
+                element={
+                  <AddAdmin inputs={employeInputs} />
+                }
+              />
+              <Route
+                path="verify/:adminId/:tokenAdmin"
+                element={
+                  <VerifyAdmin />
+                }
+              />
+            </Route>
           </Route>
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );
