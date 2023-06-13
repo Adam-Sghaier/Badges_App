@@ -14,16 +14,25 @@ export const create = (req, res) => {
 
     if (req.body.isAdmin) {
         const { isAdmin, password, etablissementId, ...otherInfos } = req.body;
-        const salt = bcrypt.genSaltSync(10);
-        const hash = bcrypt.hashSync(password, salt);
         body = { password, ...otherInfos };
+    }
+    else {
+        const { etablissementId, ...otherInfos } = req.body;
+        body = { ...otherInfos };
     }
 
     const { error } = createEmployeValidator(body);
     if (error)
         return res.status(400).send({ message: error.details[0].message });
+    if (req.body.isAdmin) {
+        const { password, ...otherInfos } = body;
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
+        body = { password: hash, etablissementId: req.body.etablissementId, isAdmin: req.body.isAdmin, ...otherInfos };
+    } else {
+        body = { etablissementId: req.body.etablissementId, ...body }
+    }
 
-    body = { ...body, etablissementId: req.body.etablissementId };
     // Save Employe in the database
     db.employe.create(body)
         .then(async (data) => {
@@ -33,7 +42,7 @@ export const create = (req, res) => {
             });
             let url;
             if (req.body.isAdmin) {
-                db.ip.create({ ip_address: aton(ip.address("public", "ipv4")), employeId: data.id })
+                await db.ip.create({ ip_address: aton(ip.address("public", "ipv4")), employeId: data.id })
                     .then(async () => {
                         url = `${process.env.BASE_URL_C}etablissement/addAdmin/verify/${data.id}/${newToken.token}`;
                         await sendVerification(
@@ -45,6 +54,7 @@ export const create = (req, res) => {
                             <a href=${url}>Click Here</a>
                             </div>`
                         );
+                        return res.status(200).json({ id: data.id, message: "une message de validation à été envoyé , veuillez vérifier votre boîte mail" });
                     })
                     .catch(err => {
                         return res.status(500).send({
@@ -62,13 +72,13 @@ export const create = (req, res) => {
                     `<div><h1>Email de confirmation de compte</h1>
                     <h2>Bonjour</h2>
                     <p>Pour vérifier votre compte Mr/Mdme ${req.body.nom} , cliquez le lien si dessus </p>
-                    <a href=${url}>Click Here</a>
+                    <a href=${url}>Click Here</a><br>
                     <b>Lors du création de votre demande du badge ,veuillez choisir cette zone : Toute Zone </b>
                     </div>`
                 );
+                return res.status(200).json({ message: "une message de validation à été envoyé , veuillez vérifier votre boîte mail" });
             }
 
-            return res.status(200).json({ id: data.id, message: "une message de validation à été envoyé , veuillez vérifier votre boîte mail" });
         })
         .catch(err => {
             return res.status(500).send({
@@ -77,6 +87,7 @@ export const create = (req, res) => {
             });
         });
 }
+
 
 export const verifyLink = async (req, res) => {
     try {

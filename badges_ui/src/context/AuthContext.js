@@ -19,25 +19,25 @@ const AuthReducer = (state, action) => {
     switch (action.type) {
         case "LOGIN_START":
             return {
-                user: JSON.parse(localStorage.getItem("user")),
+                employe: JSON.parse(localStorage.getItem("employe")),
                 loading: true,
                 error: null,
             };
         case "LOGIN_SUCCESS":
             return {
-                user: action.payload,
+                employe: action.payload,
                 loading: false,
                 error: null,
             };
         case "LOGIN_FAILURE":
             return {
-                user: JSON.parse(localStorage.getItem("user")),
+                employe: JSON.parse(localStorage.getItem("employe")),
                 loading: false,
                 error: action.payload,
             };
         case "LOGOUT":
             return {
-                user: null,
+                employe: null,
                 loading: false,
                 error: null,
             };
@@ -53,19 +53,19 @@ export const AuthContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(AuthReducer, INITIAL_STATE);
     // we gonna save the user data in local storage(table of key:string values stored locally in the browser) if case state.user is updated 
     useEffect(() => {
-        localStorage.setItem("user", JSON.stringify(state.user));
-    }, [state.user]);
+        localStorage.setItem("employe", JSON.stringify(state.employe));
+    }, [state.employe]);
     return (
         // we should expose a state to the component consuming the data
         <AuthContext.Provider
             value={{
-                user: state.user,
+                employe: state.employe,
                 loading: state.loading,
                 error: state.error,
                 state,
-                dispatch,
+                dispatch
             }}
-        >
+        >                                                   
             {children}
         </AuthContext.Provider>
     );

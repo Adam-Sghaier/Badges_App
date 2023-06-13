@@ -81,6 +81,34 @@ export const verifyLink = async (req, res) => {
     }
 }
 
+export const getEmployes = async (req, res) => {
+   
+    await db.employe.findAll({ where: { etablissementId: req.params.id } }).then((employes) => {
+        return res.status(200).json(employes);
+    })
+    
+}
+
+export const countDemandesBadges = async (req, res) => {
+    let demandesCount = 0;
+    let badgesCount = 0;
+    let employesCount ;
+    await db.employe.findAll({ where: { etablissementId: req.params.id } }).then((employes) => {
+        employesCount = employes.length;
+        
+        employes.map(async (emp) => {
+            console.log(emp.id);
+            await db.demande.count({ where: { employeId: emp.id } }).then((count) => {
+
+                demandesCount += count;
+            })
+            await db.badge.count({ where: { employeId: emp.id } }).then((count) => {
+                badgesCount += count;
+            })
+        })
+    })
+    return res.status(200).json({ demandes: demandesCount, badges: badgesCount, employes: employesCount });
+}
 
 // Retrieve all Establishments from the database.
 export const findAll = (req, res) => {

@@ -24,6 +24,14 @@ export const createEmployeValidator = (data) => {
 
 }
 
+export const loginValidator = (data) => {
+    const schema = Joi.object({
+        email: Joi.string().email().label("Email").required(),
+        password: JoiPasswordComplexity().label("Password").required()
+    });
+    return schema.validate(data);
+}
+
 export const updateEmployeValidator = (data) => {
     const schema = Joi.object({
         nom: Joi.string().min(3).max(30).label("nom"),

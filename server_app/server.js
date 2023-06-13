@@ -11,6 +11,10 @@ import { imageRouter } from "./routes/image.routes.js";
 import { demandeRouter } from './routes/demande.routes.js';
 import { agentRouter } from "./routes/agent.routes.js";
 import { ipRouter } from "./routes/ip.routes.js";
+import cookiesMiddleware from 'universal-cookie-express';
+import { authRouter } from "./routes/auth.routes.js";
+import { resetPassRouter } from "./routes/resetPassword.routes.js";
+
 const app = express();
 // const router = express.Router();
 
@@ -23,6 +27,7 @@ config();
 
 // middlewares  
 app.use(cors());
+app.use(cookiesMiddleware());
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -41,6 +46,8 @@ app.get("/", (req, res) => {
     res.send("hello , server is running");
 })
 // app routes
+app.use('/api/auth', authRouter);
+app.use('/api/resetPass', resetPassRouter);
 app.use('/api/employes', employeRouter);
 app.use('/api/etablissements', etablissementRouter);
 app.use('/api/images', imageRouter);

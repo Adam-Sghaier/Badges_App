@@ -1,0 +1,13 @@
+.list {
+  display: flex;
+  width: 100%;
+  background-color: white;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  
+  .listContainer {
+    flex: 6;
+  }
+}

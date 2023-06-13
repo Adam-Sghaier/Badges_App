@@ -4,6 +4,7 @@ import styles from "./login.module.css";
 import { AuthContext } from "../../../context/AuthContext.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 const Login = () => {
   const location = useLocation();
   const s_message = location.state?.message;
@@ -28,7 +29,7 @@ const Login = () => {
     setIsSuccessMAlertVisible(true);
     setTimeout(() => {
       setIsSuccessMAlertVisible(false);
-    }, 3000);
+    }, 4000);
   }, [isNull]);
 
   const handleChange = (e) => {
@@ -40,28 +41,34 @@ const Login = () => {
     e.preventDefault();
     // update the INITAL_STATE
     dispatch({ type: "LOGIN_START" });
-    try {
-      // post data to api server
-      const res = await axios.post("/auth/login", info);
-      // update the state data
-      if (res.status === 200) {
-        dispatch({ type: "LOGIN_SUCCESS", payload: res.data.details });
-        navigate("/dashboard");
-      } else {
-        setMessage(res.data);
-        setIsSuccessAlertVisible(true);
+
+    // post data to api server
+    await axios
+      .post("/auth/login", info)
+      .then((res) => {
+        // update the state data
+        if (res.data.isAdmin) {
+          dispatch({ type: "LOGIN_SUCCESS", payload: res.data.details });
+          navigate("/dashboard");
+        } else {
+          dispatch({ type: "LOGIN_FAILURE", payload: "You are not allowed!" });
+          setIsErrorAlertVisible(true);
+          setTimeout(() => {
+            setIsErrorAlertVisible(false);
+          }, 3000);
+        }
+      })
+      .catch((error) => {
+        dispatch({
+          type: "LOGIN_FAILURE",
+          payload: error.response.data.message,
+        });
+        // send error to auth context
+        setIsErrorAlertVisible(true);
         setTimeout(() => {
-          setIsSuccessAlertVisible(false);
+          setIsErrorAlertVisible(false);
         }, 3000);
-      }
-    } catch (error) {
-      dispatch({ type: "LOGIN_FAILURE", payload: error.response.data.message });
-      // send error to auth context
-      setIsErrorAlertVisible(true);
-      setTimeout(() => {
-        setIsErrorAlertVisible(false);
-      }, 3000);
-    }
+      });
   };
 
   return (

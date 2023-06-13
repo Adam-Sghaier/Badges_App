@@ -1,8 +1,8 @@
 import React from "react";
-import "./home.css";
+import "./homepage.css";
 import image from "../../images/OACA.jpg";
 import { useNavigate } from "react-router-dom";
-const Home = () => {
+const Homepage = () => {
   const navigate = useNavigate();
   
   return (
@@ -35,4 +35,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Homepage;
