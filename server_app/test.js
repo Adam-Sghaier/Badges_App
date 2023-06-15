@@ -1,12 +1,12 @@
-// const inputString = "04018436";
-// const regex = /(0|1){1}[0-9]{7}/;
+const inputString = "122 TUN 6556";
+const regex =/^[0-9]{2,3}[\s]{1}TUN[\s]{1}[0-9]{4}$/;
 
 
-// if (regex.test(inputString)) {
-//     console.log("Valid input");
-// } else {
-//     console.log("Invalid input");<
-// }
+if (regex.test(inputString)) {
+    console.log("Valid input");
+} else {
+    console.log("Invalid input");
+}
 
 // const tab = [[ "voiture",[{"nom_voiture": "fiat" }, { "mat": "544536 tb fdgg" }]]];
 // console.log(Object.fromEntries(tab));
@@ -47,16 +47,16 @@
 //     }
 // }
 // console.log(results)
-import ip from "ip";
+// import ip from "ip";
 
 // local ip adreess
-console.log(ip.address("public","ipv4"));
-console.log(ip.address("private","ipv4"));
+// console.log(ip.address("public","ipv4"));
+// console.log(ip.address("private","ipv4"));
 // import { publicIp, publicIpv4, publicIpv6 } from 'public-ip';
 
 // // public ip adress
 // console.log(await publicIpv4());
-import {aton,ntoa} from "inet_ipv4";
+// import {aton,ntoa} from "inet_ipv4";
 
 // console.log(aton(ip.address("private", "ipv4")));
 // console.log(ntoa(3232235794));

@@ -4,15 +4,13 @@ import { Link, useLocation } from "react-router-dom";
 import useFetch from "../../hooks/useFetch.js";
 import { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { AuthContext } from "../../context/AuthContext";
-const Datatable = ({ columns }) => {
+const Datatable = ({ columns, admin }) => {
   const location = useLocation();
   // the datatable component is use in common between three pages so we gonna differenciate the api request responses using the path value
   const path = location.pathname.split("/")[2];
-  const { employe } = useContext(AuthContext);
   const [list, setList] = useState([]);
   const { data, loading, error } = useFetch(
-    `/etablissements/${path}/${employe.etablissementId}`
+    `/etablissements/${path}/${admin.etablissementId}`
   );
 
   useEffect(() => {
@@ -64,7 +62,7 @@ const Datatable = ({ columns }) => {
       <div className="datatableTitle">
         {path}
         <Link to={`/dashboard/${path}/add`} className="link">
-          Ajout Employe
+          {`Ajout ${path}`}
         </Link>
       </div>
       <DataGrid

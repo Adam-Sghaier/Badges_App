@@ -147,47 +147,6 @@ export const findOne = (req, res) => {
         });
 }
 
-// Update a Tutorial by the id in the request
-export const updateImg = (req, res) => {
-    const id = req.params.id;
-
-    if (req.file === undefined) {
-        return res.status(400).json({ message: `You must select an image.` });
-    }
-    let image;
-    if (req.file) {
-        image = {
-            logo: {
-                type: req.file.mimetype,
-                name: req.file.originalname,
-                data: readFileSync(
-                    __dirname + "/../resources/static/assets/uploads/" + req.file.filename
-                )
-            }
-        }
-    }
-
-    db.etablissement.update(image, {
-        where: { id: id }
-    })
-        .then(num => {
-            if (num == 1) {
-                res.send({
-                    message: "Etablissement image was updated successfully."
-                });
-            } else {
-                res.send({
-                    message: `Cannot update Etablissement with id=${id}. Maybe Etablissement was not found or req.body is empty!`
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error updating Etablissement with id=" + id
-            });
-        });
-}
-
 // Delete a Tutorial with the specified id in the request
 export const _delete = (req, res) => {
     const id = req.params.id;

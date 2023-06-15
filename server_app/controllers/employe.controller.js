@@ -101,7 +101,7 @@ export const verifyLink = async (req, res) => {
 
         await db.employe.update({ verified: true }, { where: { id: employe.id } });
         await db.token.destroy({ where: { token: req.params.token } }).then(() => {
-            return res.status(200).json({ message: "lien verifié" });
+            return res.status(200).json({ message: "Employé verifié" });
         });
     } catch (error) {
         return res.status(500).send({
@@ -164,17 +164,19 @@ export const findAdmin = (req, res) => {
             }
         })
         .catch(err => {
-            res.status(500).send({
-                message: "Error retrieving Employe with id=" + id
+            res.status(500).json({
+                message: err.message ||
+                    "Error retrieving Employe with id=" + id
             });
         });
 }
+
 // Update a Employe by the id in the request
 export const update = (req, res) => {
     const id = req.params.id;
-    // const { error } = updateEmployeValidator(req.body);
-    // if (error)
-    //     return res.status(400).send({ message: error.details[0].message });
+    const { error } = updateEmployeValidator(req.body);
+    if (error)
+        return res.status(400).send({ message: error.details[0].message });
 
     const body = Object.entries(req.body);
     const properties = ["nom", "prenom", "email", "fonction", "voiture", "password",
@@ -186,12 +188,14 @@ export const update = (req, res) => {
                 for (let j = 0; j < employe.length; j++) {
 
                     if (employe[j][0] === k.split("_")[0]) {
+                        // to insert nested properties
                         const length = employe[j][1].length;
                         console.log(length);
-                        employe[j][1][length] = [k.split("_")[1], v];
+                        employe[j][1] = { ...employe[j][1], [k.split("_")[1]]: v };
                         break;
                     }
                     else if (employe[j][0] !== k.split("_")[0]) {
+                        // to insert new property
                         let pFound = false;
                         for (let h = j + 1; h < employe.length; h++) {
                             if (employe[h][0] === k.split("_")[0])
@@ -202,18 +206,20 @@ export const update = (req, res) => {
                         if (pFound) {
                             continue;
                         } else {
-                            employe.push([k.split("_")[0], [[k.split("_")[1], v]]]);
+                            employe.push([k.split("_")[0], { [k.split("_")[1]]: v }]);
                             break;
                         }
 
                     }
                 }
             } else {
-                employe.push([k.split("_")[0], [[k.split("_")[1], v]]]);
+                // to insert first property 
+                employe.push([k.split("_")[0], { [k.split("_")[1]]: v }]);
             }
 
         }
         else if (properties.includes(k)) {
+            // to insert simple properties
             if (k === "password") {
                 const salt = bcrypt.genSaltSync(10);
                 const hash = bcrypt.hashSync(v, salt);
@@ -227,7 +233,6 @@ export const update = (req, res) => {
 
     })
 
-    // res.send(Object.fromEntries(employe));
 
     db.employe.update(Object.fromEntries(employe), {
         where: { id: id }
@@ -235,11 +240,11 @@ export const update = (req, res) => {
         .then(num => {
             if (num == 1) {
                 res.send({
-                    message: "Employe was updated successfully."
+                    message: "Mise à jour des données réussie"
                 });
             } else {
                 res.send({
-                    message: `Cannot update Employe with id=${id}. Maybe Etablissement was not found or req.body is empty!`
+                    message: `Cannot update Employe with id=${id}. Maybe employe was not found or req.body is empty!`
                 });
             }
         })

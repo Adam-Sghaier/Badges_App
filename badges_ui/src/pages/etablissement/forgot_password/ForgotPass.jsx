@@ -13,7 +13,7 @@ const ForgotPass = () => {
     try {
       setLoading(true);
       const url = `/resetPass/send`;
-      const { data } = await axios.post(url, { email });
+      const { data } = await axios.post(url, { email: email });
       setMsg(data.message);
       setLoading(false);
       setError("");
@@ -38,7 +38,6 @@ const ForgotPass = () => {
           type="email"
           placeholder="Email"
           name="email"
-          value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           className={styles.input}

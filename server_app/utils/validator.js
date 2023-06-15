@@ -27,7 +27,6 @@ export const createEmployeValidator = (data) => {
 export const loginValidator = (data) => {
     const schema = Joi.object({
         email: Joi.string().email().label("Email").required(),
-        password: JoiPasswordComplexity().label("Password").required()
     });
     return schema.validate(data);
 }
@@ -38,10 +37,10 @@ export const updateEmployeValidator = (data) => {
         prenom: Joi.string().min(3).max(30).label("prenom"),
         email: Joi.string().email().label("email"),
         fonction: Joi.string().min(3).max(30).label("fonction"),
-        voiture_nom: Joi.string.min(3).max(30).label("nom voiture"),
-        voiture_matricule: Joi.string().pattern(new RegExp(/^[0-9]{2,3}[\s]{1}تونس[\s]{0,1}[0-9]{4}$/)).message('l\'immatriculation doit respecter la forme suivante (XX تونس XXXX) OU (XXX تونس XXXX)'),
+        voiture_nom: Joi.string().min(3).max(30).label("nom voiture"),
+        voiture_matricule: Joi.string().min(9).regex(/^[0-9]{2,3}TUN{1}[0-9]{3,4}$/).message('l\'immatriculation doit respecter la forme suivante (XX TUN XXXX) OU (XXX TUN XXXX)'),
         password: JoiPasswordComplexity().label("password"),
-        naissance_date: Joi.date().format('DD-MM-YYYY').max('01-01-2004').messages({ 'date.max': `Age must be 18+` }),
+        naissance_date: Joi.date().iso().max('2004-01-01').messages({ 'date.max': `L'age doit être >=18` }),
         naissance_lieu: Joi.string().min(3).max(30).label("lieu de naissance"),
         famille_pere: Joi.string().min(3).min(20).label('nom du pére'),
         famille_grandPere: Joi.string().min(3).min(20).label('nom du grand pére'),
@@ -50,10 +49,10 @@ export const updateEmployeValidator = (data) => {
         famille_conjoint: Joi.string().min(3).min(20).label('nom du conjoint'),
         famille_pereConjoint: Joi.string().min(3).min(20).label('nom du pére du conjoint'),
         adresse: Joi.string().pattern(new RegExp(/(\d*)+\s(?:[a-zA-Z0-9]+\s?)+/)).label("adresse"),
-        identification_numCin: Joi.string().pattern(new RegExp(/(0|1){1}[0-9]{7}/)).label('le numéro de la carte d\'identité nationale'),
-        identification_dateCin: Joi.date().format('DD-MM-YYYY').messages({ 'date.format': `Date format is DD-MM-YYYY` }),
-        identification_numPasseport: Joi.string().min(7).label("numéro du passeport"),
-        identification_datePasseport: Joi.date().format('DD-MM-YYYY').messages({ 'date.format': `Date format is DD-MM-YYYY` })
+        identification_numCin: Joi.string().pattern(new RegExp(/(0|1){1}[0-9]{7}/)).message("le numéro du CIN doît respecter la forme suivante 0XXXXXXX ou 1XXXXXXX (X 7fois)"),
+        identification_dateCin: Joi.date().iso().messages({ 'date.format': `format du date est la suivante YYYY-MM-DD` }),
+        identification_numPasseport: Joi.string().min(7).max(9).label("numéro du passeport"),
+        identification_datePasseport: Joi.date().iso().messages({ 'date.format': `format du date est la suivante YYYY-MM-DD` })
     });
     return schema.validate(data);
 

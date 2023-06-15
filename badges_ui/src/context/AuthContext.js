@@ -6,6 +6,7 @@ import { createContext, useEffect, useReducer } from "react";
 const INITIAL_STATE = {
     // Converts a JavaScript Object Notation (JSON) string into an object.
     // when we refresh the page , the local storage is checked firstly to set user value else null
+    admin: JSON.parse(localStorage.getItem("admin")) || null,
     employe: JSON.parse(localStorage.getItem("employe")) || null,
     loading: false,
     error: null
@@ -19,29 +20,46 @@ const AuthReducer = (state, action) => {
     switch (action.type) {
         case "LOGIN_START":
             return {
+                admin: JSON.parse(localStorage.getItem("admin")),
                 employe: JSON.parse(localStorage.getItem("employe")),
                 loading: true,
                 error: null,
             };
-        case "LOGIN_SUCCESS":
+        case "LOGIN_SUCCESS_A":
             return {
+                admin: action.payload,
+                employe: JSON.parse(localStorage.getItem("employe")),
+                loading: false,
+                error: null,
+            };
+        case "LOGIN_SUCCESS_E":
+            return {
+                admin: JSON.parse(localStorage.getItem("admin")),
                 employe: action.payload,
                 loading: false,
                 error: null,
             };
         case "LOGIN_FAILURE":
             return {
+                admin: JSON.parse(localStorage.getItem("admin")),
                 employe: JSON.parse(localStorage.getItem("employe")),
                 loading: false,
                 error: action.payload,
             };
-        case "LOGOUT":
+        case "LOGOUT_A":
             return {
+                admin: null,
+                employe: JSON.parse(localStorage.getItem("employe")),
+                loading: false,
+                error: null,
+            };
+        case "LOGOUT_E":
+            return {
+                admin: JSON.parse(localStorage.getItem("admin")),
                 employe: null,
                 loading: false,
                 error: null,
             };
-
         default:
             return state;
     }
@@ -55,17 +73,21 @@ export const AuthContextProvider = ({ children }) => {
     useEffect(() => {
         localStorage.setItem("employe", JSON.stringify(state.employe));
     }, [state.employe]);
+    useEffect(() => {
+        localStorage.setItem("admin", JSON.stringify(state.admin));
+    }, [state.admin]);
     return (
         // we should expose a state to the component consuming the data
         <AuthContext.Provider
             value={{
+                admin: state.admin,
                 employe: state.employe,
                 loading: state.loading,
                 error: state.error,
                 state,
                 dispatch
             }}
-        >                                                   
+        >
             {children}
         </AuthContext.Provider>
     );

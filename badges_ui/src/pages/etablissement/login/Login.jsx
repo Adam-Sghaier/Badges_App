@@ -8,12 +8,10 @@ import axios from "axios";
 const Login = () => {
   const location = useLocation();
   const s_message = location.state?.message;
-  const [isSuccessMAlertVisible, setIsSuccessMAlertVisible] = useState(false);
   const isNull = s_message === undefined;
   const [info, setInfo] = useState();
   const [isErrorAlertVisible, setIsErrorAlertVisible] = useState(false);
   const [isSuccessAlertVisible, setIsSuccessAlertVisible] = useState(false);
-  const [message, setMessage] = useState("");
   const [passwordType, setPasswordType] = useState("password");
   const navigate = useNavigate();
   const { loading, error, dispatch } = useContext(AuthContext);
@@ -26,9 +24,9 @@ const Login = () => {
   };
 
   useEffect(() => {
-    setIsSuccessMAlertVisible(true);
+    setIsSuccessAlertVisible(true);
     setTimeout(() => {
-      setIsSuccessMAlertVisible(false);
+      setIsSuccessAlertVisible(false);
     }, 4000);
   }, [isNull]);
 
@@ -48,7 +46,7 @@ const Login = () => {
       .then((res) => {
         // update the state data
         if (res.data.isAdmin) {
-          dispatch({ type: "LOGIN_SUCCESS", payload: res.data.details });
+          dispatch({ type: "LOGIN_SUCCESS_A", payload: res.data.details });
           navigate("/dashboard");
         } else {
           dispatch({ type: "LOGIN_FAILURE", payload: "You are not allowed!" });
@@ -73,7 +71,7 @@ const Login = () => {
 
   return (
     <div className={styles.bg_black}>
-      {s_message !== undefined && isSuccessMAlertVisible && (
+      {s_message !== undefined && isSuccessAlertVisible && (
         <div className={styles.success_alert}>{s_message}</div>
       )}
       <div className={styles.login_form_container}>
@@ -114,10 +112,7 @@ const Login = () => {
             {isErrorAlertVisible && (
               <div className={styles.error_msg}>{error}</div>
             )}
-            {isSuccessAlertVisible && (
-              <div className={styles.success_msg}>{message}</div>
-            )}
-
+           
             <button
               type="submit"
               disabled={loading}

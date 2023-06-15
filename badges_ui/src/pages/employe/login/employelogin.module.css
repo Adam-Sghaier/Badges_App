@@ -5,6 +5,7 @@
   justify-content: center;
   align-items: center;
   position: absolute;
+  gap: 1em;
   left: 0;
   top: 0;
   color: #fff;
@@ -13,33 +14,35 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.form_container {
-  width: 400px;
-  padding: 10px;
-  background-color: rgba(0, 0, 0, 0.5);
-  gap: 1em;
+.success_alert {
+  width: 300px;
+  padding: 20px;
+  color: white;
+  background-color: #003580;
   border-radius: 10px;
-  display: flex;
-  flex-direction: column;
   text-align: center;
+}
+
+.login_form_container {
+  width: 500px;
+  height: 450px;
+  display: flex;
+  justify-content: center;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
   box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%),
     0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
 }
-.passwordInput {
-  position: relative;
+
+
+.form_container {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  gap: 1em;
 }
-.passwordInput button {
-  background-color: #edf5f3;
-  border: none;
-  position: absolute;
-  right: 10px;
-  font-size: 17px;
-  cursor: pointer;
-  border-radius: 10px;
-}
+
 .input {
   outline: none;
   border: none;
@@ -51,22 +54,31 @@
   font-size: 14px;
 }
 
-.blue_btn {
-  border: none;
-  outline: none;
-  padding: 12px 0;
-  background-color: #003580;
-  color: white;
-  border-radius: 20px;
-  width: 180px;
-  font-weight: bold;
-  font-size: 14px;
-  cursor: pointer;
-  margin: 10px auto;
+.passwordInput {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.error_msg {
-  width: 340px;
+.passwordInput button {
+  background-color: #edf5f3;
+  border: none;
+  position: absolute;
+  right: 10px;
+  font-size: 17px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.fPass {
+  align-self: flex-start;
+  color: white;
+  text-decoration: none;
+}
+
+.error_msg,
+.success_msg {
+  width: 370px;
   padding: 15px;
   margin: 5px 0;
   font-size: 14px;
@@ -75,6 +87,24 @@
   border-radius: 5px;
   text-align: center;
 }
+
+.success_msg {
+  background-color: #0071c2;
+}
+
+.blue_btn {
+  border: none;
+  outline: none;
+  padding: 12px 0;
+  background-color: #003580;
+  border-radius: 20px;
+  color: white;
+  width: 180px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 
 .blue_btn:disabled {
   background-color: #0071c28c;

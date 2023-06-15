@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./addadmin.module.css";
 import axios from "axios";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";

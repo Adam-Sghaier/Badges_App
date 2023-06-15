@@ -7,21 +7,26 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import SettingsSystemDaydreamOutlinedIcon from "@mui/icons-material/SettingsSystemDaydreamOutlined";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 const Sidebar = () => {
-  const { dispatch } = useContext(DarkModeContext); 
-
+  const { dispatch } = useContext(DarkModeContext);
+  const location = useLocation();
   const authContext = useContext(AuthContext);
-
+  const path = location.pathname.split("/")[1];
   const navigate = useNavigate();
   const handleClick = () => {
-    authContext.dispatch({ type: "LOGOUT" });
-    navigate("/etablissement/login");
+    if (path === "dashboard") {
+      authContext.dispatch({ type: "LOGOUT_A" });
+      navigate("/etablissement/login");
+    } else {
+      authContext.dispatch({ type: "LOGOUT_E" });
+      navigate("/employe/login");
+    }
   };
   return (
     <div className="sidebar">
@@ -33,7 +38,6 @@ const Sidebar = () => {
       <hr />
       <div className="center">
         <ul>
-          
           <p className="title">LISTS</p>
           <Link to="/dashboard/employes" style={{ textDecoration: "none" }}>
             <li>
@@ -53,7 +57,7 @@ const Sidebar = () => {
               <span>Badges</span>
             </li>
           </Link>
-          
+
           <p className="title">USEFUL</p>
           <li>
             <InsertChartIcon className="icon" />

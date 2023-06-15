@@ -1,10 +1,12 @@
 import axios from "axios";
 import styles from './resetpassword.module.css';
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 const ResetPassword = () => {
+  const location = useLocation();
+  const path = location.pathname.split("/")[1];
   const [validUrl, setValidUrl] = useState(false);
   const [passwordType, setPasswordType] = useState("password");
   const [password, setPassword] = useState("");
@@ -47,7 +49,7 @@ const ResetPassword = () => {
         { password }
       );
       const message = data.message;
-      navigate("/etablissement/login", { state: { message } });
+      navigate(`/${path}/login`, { state: { message } });
     } catch (error) {
       setLoading(false);
       setError(error.response.data.message);

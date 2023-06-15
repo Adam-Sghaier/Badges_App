@@ -1,16 +1,14 @@
 import { useContext, useState } from "react";
 import "./ajoutemploye.scss";
-import { AuthContext } from "../../../../context/AuthContext";
 import Sidebar from "../../../../components/sidebar/Sidebar";
 import Navbar from "../../../../components/navbar/Navbar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-const AjoutEmploye = ({ inputs }) => {
-  const { employe } = useContext(AuthContext);
+const AjoutEmploye = ({ inputs, admin }) => {
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState({
-    etablissementId: employe.etablissementId,
+    etablissementId: admin.etablissementId,
   });
   const [message, setMessage] = useState("");
   const [isSuccessAlertVisible, setIsSuccessAlertVisible] = useState(false);

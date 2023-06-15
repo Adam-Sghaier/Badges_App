@@ -9,23 +9,22 @@ import { randomBytes } from "crypto";
 
 export const login = async (req, res, next) => {
     try {
-        const { error } = loginValidator(req.body);
+        const { error } = loginValidator({ email: req.body.email });
         if (error)
             return res.status(400).json({ message: error.details[0].message });
         // the find one method returns one document
         await db.employe.findOne({ where: { email: req.body.email } }).then(async (emp) => {
             if (!emp) {
-                return res.status(404).json({ message: "cet email n'existe pas" });
+                return res.status(404).json({ message: "email incorrect" });
             }
             const isPasswordCorrect = await bcrypt.compare(
                 req.body.password,
                 emp.password
             );
-            if (!isPasswordCorrect) return res.status(404).json({ message: "mot de passe incorrect" });
-            let token1 = await db.token.findOne({ employeId: emp.id });
-
+            if (!isPasswordCorrect) { return res.status(404).json({ message: "mot de passe incorrect" }); }
 
             if (!emp.verified) {
+                let token1 = await db.token.findOne({ where: { employeId: emp.id } });
 
                 if (!token1) {
                     const newToken = await db.token.create({
@@ -33,16 +32,30 @@ export const login = async (req, res, next) => {
                         token: randomBytes(32).toString("hex"),
                     });
 
-                    url = `${process.env.BASE_URL_C}etablissement/addAdmin/verify/${emp.id}/${newToken.token}`;
-                    await sendVerification(
-                        data.email,
-                        "Email de confirmation",
-                        `<div><h1>Email de confirmation de compte</h1>
+                    if (emp.isAdmin) {
+                        url = `${process.env.BASE_URL_C}etablissement/addAdmin/verify/${emp.id}/${newToken.token}`;
+                        await sendVerification(
+                            data.email,
+                            "Email de confirmation",
+                            `<div><h1>Email de confirmation de compte</h1>
+                                <h2>Bonjour</h2>
+                                <p>Pour vérifier votre compte Mr/Mdme ${req.body.nom} , cliquez le lien si dessus </p>
+                                <a href=${url}>Click Here</a>
+                                </div>`
+                        );
+                    } else {
+                        url = `${process.env.BASE_URL_C}employe/verify/${data.id}/${newToken.token}`;
+                        await sendVerification(
+                            data.email,
+                            "Email de confirmation",
+                            `<div><h1>Email de confirmation de compte</h1>
                             <h2>Bonjour</h2>
                             <p>Pour vérifier votre compte Mr/Mdme ${req.body.nom} , cliquez le lien si dessus </p>
-                            <a href=${url}>Click Here</a>
+                            <a href=${url}>Click Here</a><br>
+                            <b>Lors du création de votre demande du badge ,veuillez choisir cette zone : Toute Zone </b>
                             </div>`
-                    );
+                        );
+                    }
                 }
                 if (emp.isAdmin) {
                     await db.ip.findOne({ where: { ip_address: aton(ip.address("public", "ipv4")), employeId: emp.id } }).then(async (id) => {
@@ -57,7 +70,7 @@ export const login = async (req, res, next) => {
             // we gonna sign(hash) this data in jwt string format and for each api request we gonna use this jwt to verify our identity
             const token = jwt.sign(
                 { id: emp.id, isAdmin: emp.isAdmin },
-                process.env.JWT
+                randomBytes(32).toString("hex")
             );
             // we're excluding password & isAdmin properties because they are sensitive data that shouldn't be returned to frontend using the user._doc(this statement is affecting the user._doc value to the ...otherProperties object)
             const { nom, prenom, email, isAdmin, etablissementId, ...otherProperties } = emp;

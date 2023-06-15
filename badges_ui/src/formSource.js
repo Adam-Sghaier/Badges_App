@@ -21,6 +21,23 @@ export const employeInputs = [
   }
 ];
 
+export const employeAdminInputs = [
+  {
+    id: "nom",
+    type: "text",
+    placeholder: "Nom",
+  },
+  {
+    id: "prenom",
+    type: "text",
+    placeholder: "Prénom",
+  },
+  {
+    id: "email",
+    type: "email",
+    placeholder: "Email",
+  }
+];
 export const productInputs = [
   {
     id: 1,

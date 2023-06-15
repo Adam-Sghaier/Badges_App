@@ -12,25 +12,31 @@ export const resetPassEmail = async (req, res, next) => {
         const emailSchema = Joi.object({
             email: Joi.string().email().required().label("Email")
         });
+        console.log(req.body.email)
         const { error } = emailSchema.validate(req.body);
         if (error)
             return res.status(400).json({ message: error.details[0].message });
         // 2/ format is correct => check the existence of the user
-        let employe = await db.employe.findOne({ email: req.body.email });
+        const employe = await db.employe.findOne({ where: { email: req.body.email } });
         if (!employe)
             return res
                 .status(409)
                 .json({ message: "l'email n'existe pas" });
 
-        let token = await db.token.findOne({ employeId: employe.id });
+        let token = await db.token.findOne({ where: { employeId: employe.id } });
         if (!token) {
             token = await db.token.create({
                 employeId: employe.id,
                 token: crypto.randomBytes(32).toString("hex"),
             });
         }
-
-        const url = `${process.env.BASE_URL_C}etablissement/login/password_reset/${employe.id}/${token.token}`;
+        let url;
+        if (employe.isAdmin) {
+            url = `${process.env.BASE_URL_C}etablissement/login/password_reset/${employe.id}/${token.token}`;
+        }
+        else {
+            url = `${process.env.BASE_URL_C}employe/login/password_reset/${employe.id}/${token.token}`;
+        }
 
         await sendVerification(employe.email, "Changer mot de passe", `<div><h1>Lien de réintialisation de mot de passe</h1>
             <h2>Bonjour</h2>
@@ -55,8 +61,11 @@ export const verifyLink = async (req, res) => {
         }
 
         const token = await db.token.findOne({
-            employeId: employe.id,
-            token: req.params.token,
+            where: {
+                employeId: employe.id,
+                token: req.params.token,
+            }
+
         });
         if (!token) {
             return res.status(400).json({ message: "token de validation incorrect" });
@@ -80,8 +89,10 @@ export const setPassword = async (req, res) => {
         if (!employe) return res.status(400).json({ message: "id d'employe invalide" });
 
         let token = await db.token.findOne({
-            employeId: employe.id,
-            token: req.params.token,
+            where: {
+                employeId: employe.id,
+                token: req.params.token,
+            }
         });
         if (!token) return res.status(400).json({ message: "token de validation invalide" });
 
@@ -89,15 +100,18 @@ export const setPassword = async (req, res) => {
             let url;
             if (employe.isAdmin) {
                 url = `${process.env.BASE_URL_C}etablissement/addAdmin/verify/${employe.id}/${token.token}`;
-            }else{
+            } else {
                 url = `${process.env.BASE_URL_C}employe/verify/${employe.id}/${token.token}`;
             }
-            await sendVerification(employe.email, "Password Reset", `<div><h1>Reset Password </h1>
-            <h2>Bonjour</h2>
-            <p>Pour vérifier votre compte,cliquez le lien si dessus </p>
-            <a href=${url}>Click Here</a>
-            </div>`);
-
+            await sendVerification(
+                employe.email,
+                "Email de confirmation",
+                `<div><h1>Email de confirmation de compte</h1>
+                <h2>Bonjour</h2>
+                <p>Pour vérifier votre compte Mr/Mdme ${employe.nom} , cliquez le lien si dessus </p>
+                <a href=${url}>Click Here</a>
+                </div>`
+            );
             return res
                 .status(400)
                 .json({ message: "un email de valdation à été envoyé , validez votre email d'abord et revenez pour modifer le password" });

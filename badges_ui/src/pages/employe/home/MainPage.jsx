@@ -1,19 +1,18 @@
+import { useEffect, useState } from "react";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import Navbar from "../../../components/navbar/Navbar";
-import "./home.scss";
 import Widget from "../../../components/widget/Widget";
-import {  useEffect, useState } from "react";
-import axios from "axios";
 import { arrayBufferToBase64 } from "../../../utils/arrayBufferHandler";
+import axios from "axios";
 
-const Home = ({ admin }) => {
+const MainPage = ({ employe }) => {
   const [etabInfo, setEtabInfo] = useState({});
   const [imgSrc, setImgSrc] = useState("");
 
   useEffect(() => {
     const getEtab = async () => {
       await axios
-        .get(`/etablissements/${admin.etablissementId}`)
+        .get(`/etablissements/${employe.etablissementId}`)
         .then((res) => {
           setEtabInfo(res.data);
         })
@@ -22,7 +21,7 @@ const Home = ({ admin }) => {
         });
     };
     getEtab();
-  }, [admin]);
+  }, [location]);
 
   useEffect(() => {
     const base64String = arrayBufferToBase64(etabInfo?.logo?.data?.data);
@@ -36,22 +35,18 @@ const Home = ({ admin }) => {
         <Navbar />
         <div className="widgets">
           <div className="etabInfo">
-            <img
-              src={`${imgSrc}`}
-              alt=""
-              className="etabLogo"
-            />
+            <img src={`${imgSrc}`} alt="" className="etabLogo" />
             <h1>{etabInfo.denominationSociale}</h1>
           </div>
-          <div className="stats">
-            <Widget type="employes" etabId={admin.etablissementId} />
-            <Widget type="demandes" etabId={admin.etablissementId} />
-            <Widget type="badges" etabId={admin.etablissementId} />
-          </div>
+          {/* <div className="stats">
+            <Widget type="employes" etabId={employe.etablissementId} />
+            <Widget type="demandes" etabId={employe.etablissementId} />
+            <Widget type="badges" etabId={employe.etablissementId} />
+          </div> */}
         </div>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default MainPage;
